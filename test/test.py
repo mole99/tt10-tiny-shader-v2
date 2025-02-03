@@ -30,6 +30,8 @@ VBACK    = 33
 
 POLARITY = 0
 
+os.makedirs('images/', exist_ok=True)
+
 # Reset coroutine
 async def reset_dut(rst_ni, duration_ns):
     rst_ni.value = 0
@@ -126,13 +128,13 @@ async def test_vga_default(dut):
     task_draw_frame = await cocotb.start(draw_frame(dut))
 
     image = await task_draw_frame.join()
-    image.save(f"default.png")
+    image.save(f"images/default.png")
     
     # Start thread to draw frame
     task_draw_frame = await cocotb.start(draw_frame(dut))
 
     image = await task_draw_frame.join()
-    image.save(f"default2.png")
+    image.save(f"images/default2.png")
 
     await ClockCycles(dut.clk, 10)
 
@@ -196,15 +198,12 @@ async def test_vga_load(dut, shader_name='test7'):
     
     # Start thread to draw frame
     task_draw_frame = await cocotb.start(draw_frame(dut))
-
     image = await task_draw_frame.join()
     image.save(f"images/{shader_name}.png")
     
-    gold = Image.open(f'../sw/images/{shader_name}.png')
-    
     # Scale with factor
+    gold = Image.open(f'../sw/images/{shader_name}.png')
     gold = gold.resize((gold.width*NUM_INSTR//SCALE, gold.height*NUM_INSTR//SCALE), Image.NEAREST)
-    
     gold.save(f"images/{shader_name}_gold.png")
     
     # Check that images are the same
