@@ -5,7 +5,13 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v
+PROJECT_SOURCES = tt_um_tiny_shader_v2_mole99.sv \
+		  tiny_shader_top.sv \
+		  shader_execute.sv \
+		  shader_memory.sv \
+  		  spi_receiver.sv \
+		  timing.sv \
+		  synchronizer.sv
 
 ifneq ($(GATES),yes)
 
