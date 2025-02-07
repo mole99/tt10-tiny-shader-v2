@@ -37,23 +37,26 @@ module shader_memory #(
     
         if (i < NUM_INSTR-1) begin
             //memory[i] <= memory[i+1];
-            
             sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
+                `ifdef USE_POWER_PINS
+                .VPWR(1'b1),
+                .VGND(1'b0),
+                .VPB (1'b1),
+                .VNB (1'b0),
+                `endif
                 .A   (memory[i+1]),
                 .X   (delay[i])
-                /*VPWR,
-                VGND,
-                VPB ,
-                VNB*/
             );
         end else begin
             sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
+                `ifdef USE_POWER_PINS
+                .VPWR(1'b1),
+                .VGND(1'b0),
+                .VPB (1'b1),
+                .VNB (1'b0),
+                `endif
                 .A   (last_instr),
                 .X   (delay[i])
-                /*VPWR,
-                VGND,
-                VPB ,
-                VNB*/
             );
         end
     end
