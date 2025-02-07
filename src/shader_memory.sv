@@ -31,32 +31,33 @@ module shader_memory #(
     
     generate
     
-    genvar i;
+    genvar i, j;
     for (i=0; i<NUM_INSTR; i++) begin : delays
-    
-        if (i < NUM_INSTR-1) begin
-            //memory[i] <= memory[i+1];
-            sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
-                `ifdef USE_POWER_PINS
-                .VPWR({8{1'b1}}),
-                .VGND({8{1'b0}}),
-                .VPB ({8{1'b1}}),
-                .VNB ({8{1'b0}}),
-                `endif
-                .A   (memory[i+1]),
-                .X   (delay[i])
-            );
-        end else begin
-            sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
-                `ifdef USE_POWER_PINS
-                .VPWR({8{1'b1}}),
-                .VGND({8{1'b0}}),
-                .VPB ({8{1'b1}}),
-                .VNB ({8{1'b0}}),
-                `endif
-                .A   (last_instr),
-                .X   (delay[i])
-            );
+        for (j=0; j<8; j++) begin : bits
+            if (i < NUM_INSTR-1) begin
+                //memory[i] <= memory[i+1];
+                sky130_fd_sc_hd__dlygate4sd1_1 i_delay (
+                    `ifdef USE_POWER_PINS
+                    .VPWR(1'b1),
+                    .VGND(1'b0),
+                    .VPB (1'b1),
+                    .VNB (1'b0),
+                    `endif
+                    .A   (memory[i+1][j]),
+                    .X   (delay[i][j])
+                );
+            end else begin
+                sky130_fd_sc_hd__dlygate4sd1_1 i_delay (
+                    `ifdef USE_POWER_PINS
+                    .VPWR(1'b1),
+                    .VGND(1'b0),
+                    .VPB (1'b1),
+                    .VNB (1'b0),
+                    `endif
+                    .A   (last_instr[j]),
+                    .X   (delay[i][j])
+                );
+            end
         end
     end
     
