@@ -15,7 +15,7 @@ module shader_memory #(
 );
     logic [7:0] memory [NUM_INSTR];
     
-    logic [7:0] delay [NUM_INSTR];
+    wire [7:0] delay [NUM_INSTR];
 
     // TODO add dlygate3sd3_1
     
