@@ -36,7 +36,7 @@ module shader_memory #(
         for (j=0; j<8; j++) begin : bits
             if (i < NUM_INSTR-1) begin
                 //memory[i] <= memory[i+1];
-                sky130_fd_sc_hd__dlygate4sd2_1 i_delay (
+                sky130_fd_sc_hd__dlygate4sd3_1 i_delay (
                     `ifdef USE_POWER_PINS
                     .VPWR(1'b1),
                     .VGND(1'b0),
@@ -47,7 +47,7 @@ module shader_memory #(
                     .X   (delay[i][j])
                 );
             end else begin
-                sky130_fd_sc_hd__dlygate4sd2_1 i_delay (
+                sky130_fd_sc_hd__dlygate4sd3_1 i_delay (
                     `ifdef USE_POWER_PINS
                     .VPWR(1'b1),
                     .VGND(1'b0),
