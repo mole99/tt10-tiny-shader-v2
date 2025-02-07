@@ -23,26 +23,25 @@ module shader_memory #(
     dlygate4sd2
     dlygate4sd3*/
     
-    generate
-    
-    genvar i;
-    
     logic [7:0] last_instr;
     
     // Load a new word from externally
     // Else just shift circularily
     assign last_instr = load_i ? instr_i : memory[0];
     
+    generate
+    
+    genvar i;
     for (i=0; i<NUM_INSTR; i++) begin : delays
     
         if (i < NUM_INSTR-1) begin
             //memory[i] <= memory[i+1];
             sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
                 `ifdef USE_POWER_PINS
-                .VPWR(1'b1),
-                .VGND(1'b0),
-                .VPB (1'b1),
-                .VNB (1'b0),
+                .VPWR({8{1'b1}}),
+                .VGND({8{1'b0}}),
+                .VPB ({8{1'b1}}),
+                .VNB ({8{1'b0}}),
                 `endif
                 .A   (memory[i+1]),
                 .X   (delay[i])
@@ -50,10 +49,10 @@ module shader_memory #(
         end else begin
             sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
                 `ifdef USE_POWER_PINS
-                .VPWR(1'b1),
-                .VGND(1'b0),
-                .VPB (1'b1),
-                .VNB (1'b0),
+                .VPWR({8{1'b1}}),
+                .VGND({8{1'b0}}),
+                .VPB ({8{1'b1}}),
+                .VNB ({8{1'b0}}),
                 `endif
                 .A   (last_instr),
                 .X   (delay[i])
