@@ -14,8 +14,51 @@ module shader_memory #(
     output logic [7:0]  instr_o
 );
     logic [7:0] memory [NUM_INSTR];
+    
+    logic [7:0] delay [NUM_INSTR];
 
     // TODO add dlygate3sd3_1
+    
+    /*dlygate4sd1
+    dlygate4sd2
+    dlygate4sd3*/
+    
+    generate
+    
+    genvar i;
+    
+    logic [7:0] last_instr;
+    
+    // Load a new word from externally
+    // Else just shift circularily
+    assign last_instr = load_i ? instr_i : memory[0];
+    
+    for (i=0; i<NUM_INSTR; i++) begin : delays
+    
+        if (i < NUM_INSTR-1) begin
+            //memory[i] <= memory[i+1];
+            
+            sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
+                .A   (memory[i+1]),
+                .X   (delay[i])
+                /*VPWR,
+                VGND,
+                VPB ,
+                VNB*/
+            );
+        end else begin
+            sky130_fd_sc_hd__dlygate4sd1_1 i_delay [7:0] (
+                .A   (last_instr),
+                .X   (delay[i])
+                /*VPWR,
+                VGND,
+                VPB ,
+                VNB*/
+            );
+        end
+    end
+    
+    endgenerate
 
     // Initialize the memory on reset 
     // Shift the memory by a whole word if shift_i is high
@@ -48,7 +91,7 @@ module shader_memory #(
         end else begin
             if (shift_i) begin
                 for (int i=0; i<NUM_INSTR; i++) begin
-                    if (i < NUM_INSTR-1) begin
+                    /*if (i < NUM_INSTR-1) begin
                         memory[i] <= memory[i+1];
                     end else begin
                         // Load a new word from externally
@@ -58,7 +101,9 @@ module shader_memory #(
                         end else begin
                             memory[i] <= memory[0];
                         end
-                    end
+                    end*/
+                    
+                    memory[i] <= delay[i];
                 end
             end
         end
