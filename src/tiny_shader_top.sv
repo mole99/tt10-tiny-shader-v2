@@ -18,16 +18,18 @@ module tiny_shader_top (
     // '1' = data mode
     input  logic mode_i,
     
+    // Pause shader execution
+    // '0' = shader starts execution as normal
+    // '1' = shader does not restart execution after
+    //       current pixel has been finished
+    input  logic pause_execute_i,
+    
     // SVGA signals
     output logic [5:0] rrggbb_o,
     output logic       hsync_o,
     output logic       vsync_o,
     output logic       next_vertical_o,
-    output logic       next_frame_o,
-    
-    // Debug signals
-    input  logic [1:0] debug_i,
-    output logic [1:0] debug_o
+    output logic       next_frame_o
 );
 
     /* Tiny Shader Settings */
@@ -178,16 +180,20 @@ module tiny_shader_top (
     );
 
     // Graphics
-
     logic [7:0] instr;
-
     logic execute_shader_x, execute_shader_y, execute_shader;
     
+    // Execute shader only when in active drawing area and not paused
     assign execute_shader_y = counter_v >= 0 && counter_v < HEIGHT;
     assign execute_shader_x = counter_h+(NUM_INSTR/2) >= 0 && counter_h+(NUM_INSTR/2) < WIDTH;
+    assign execute_shader = execute_shader_x && execute_shader_y && !pause_execute_i;
 
-    assign execute_shader = execute_shader_x && execute_shader_y;
-                            
+    logic execute_shader_d;
+    
+    always_ff @(posedge clk_i) begin
+        execute_shader_d <= execute_shader;
+    end
+
     /* Shader Memory */
 
     shader_memory #(
@@ -203,7 +209,7 @@ module tiny_shader_top (
     
     /* Count x and y positions */
 
-    localparam WIDTH_SMALL = WIDTH / (NUM_INSTR/2);
+    localparam WIDTH_SMALL  = WIDTH  / (NUM_INSTR/2);
     localparam HEIGHT_SMALL = HEIGHT / (NUM_INSTR/2);
     
     logic [$clog2(WIDTH_SMALL)  - 1:0] x_pos;
@@ -244,25 +250,15 @@ module tiny_shader_top (
         end
     end
 
-    // Capture output color, after shader completed
-    
+    // Capture output color, after shader has completed
 
-    
     logic capture;
-    
-    logic execute_shader_d;
-    
     assign capture = capture_counter == 0 && execute_shader_d;
     
     always_ff @(posedge clk_i, negedge rst_ni) begin
         if (!rst_ni) begin
-            //capture <= '0;
             rgb_d <= '0;
         end else begin
-            //capture <= capture_counter == 0;//counter_h[2:0] == (NUM_INSTR>>1)-1; // TODO 2 cycles active
-
-            execute_shader_d <= execute_shader;
-
             if (capture) begin
                 rgb_d <= rgb_o;
             end
@@ -274,6 +270,7 @@ module tiny_shader_top (
         end
     end
     
+    // Output color
     assign rrggbb_o = rgb_d;
     
     // Delay output signals one cycle
@@ -283,17 +280,6 @@ module tiny_shader_top (
         vsync_o         <= vsync;
         next_vertical_o <= next_vertical;
         next_frame_o    <= next_frame;
-    end
-
-    /* Debug */
-    
-    always_comb begin
-        case (debug_i)
-            2'b00: debug_o = {cur_time[1], cur_time[0]};
-            2'b01: debug_o = {cur_time[8], cur_time[7]};
-            2'b10: debug_o = {execute_shader_x, execute_shader_y};
-            2'b11: debug_o = {memory_shift, memory_load};
-        endcase
     end
 
 endmodule

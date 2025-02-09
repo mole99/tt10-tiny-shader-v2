@@ -59,6 +59,7 @@ module tb ();
     wire spi_cs;
     
     wire mode;
+    wire pause_execute;
 
     // Output PMOD - Tiny VGA
 
@@ -80,6 +81,7 @@ module tb ();
     // Input PMOD - mode
     
     assign ui_in[0] = mode;
+    assign ui_in[1] = pause_execute;
 
     // Replace tt_um_example with your module name:
     tt_um_tiny_shader_v2_mole99 tt_um_tiny_shader_v2_mole99_inst (

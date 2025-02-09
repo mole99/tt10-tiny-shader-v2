@@ -116,6 +116,7 @@ async def test_vga_default(dut):
     # Assign default values
     dut.ena.value = 1
     dut.mode.value = 0 # cmd mode
+    dut.pause_execute.value = 0 # run shader
 
     # Reset
     await reset_dut(dut.rst_n, 50)
@@ -178,6 +179,7 @@ async def test_vga_load(dut, shader_name='test7'):
     # Assign default values
     dut.ena.value = 1
     dut.mode.value = 0 # cmd mode
+    dut.pause_execute.value = 1 # pause shader
 
     # Reset
     await reset_dut(dut.rst_n, 50)
@@ -192,6 +194,8 @@ async def test_vga_load(dut, shader_name='test7'):
 
     # Send new shader instructions
     await spi_master.write(shader, burst=True)
+    
+    dut.pause_execute.value = 0 # run shader
     
     # Sync to start of frame
     await sync_frame(dut)
@@ -240,6 +244,7 @@ async def test_spi_regs(dut):
     # Assign default values
     dut.ena.value = 1
     dut.mode.value = 0 # cmd mode
+    dut.pause_execute.value = 0 # run shader
 
     # Reset
     await reset_dut(dut.rst_n, 50)
@@ -286,6 +291,7 @@ async def test_spi_shader(dut):
     # Assign default values
     dut.ena.value = 1
     dut.mode.value = 1 # data mode
+    dut.pause_execute.value = 1 # pause shader
 
     # Reset
     await reset_dut(dut.rst_n, 50)
@@ -325,6 +331,7 @@ async def test_spi_random(dut):
     # Assign default values
     dut.ena.value = 1
     dut.mode.value = 0 # cmd mode
+    dut.pause_execute.value = 1 # pause shader
 
     # Reset
     await reset_dut(dut.rst_n, 50)

@@ -26,6 +26,7 @@ module tt_um_tiny_shader_v2_mole99 (
     logic spi_cs;
     
     logic mode;
+    logic pause_execute;
     
     logic [5:0] rrggbb;
     logic hsync;
@@ -33,34 +34,28 @@ module tt_um_tiny_shader_v2_mole99 (
     logic next_vertical;
     logic next_frame;
     
-    logic [1:0] debug_i;
-    logic [1:0] debug_o;
-    
     tiny_shader_top #(
     
     ) tiny_shader_top_inst (
-        .clk_i      (clk),
-        .rst_ni     (rst_n_sync),
+        .clk_i              (clk),
+        .rst_ni             (rst_n_sync),
 
         // SPI signals
-        .spi_sclk_i     (spi_sclk),
-        .spi_mosi_i     (spi_mosi),
-        .spi_miso_o     (spi_miso),
-        .spi_cs_i       (spi_cs),
+        .spi_sclk_i         (spi_sclk),
+        .spi_mosi_i         (spi_mosi),
+        .spi_miso_o         (spi_miso),
+        .spi_cs_i           (spi_cs),
         
         // Mode signal
-        .mode_i         (mode),
+        .mode_i             (mode),
+        .pause_execute_i    (pause_execute),
 
         // SVGA signals
-        .rrggbb_o         (rrggbb),
-        .hsync_o          (hsync),
-        .vsync_o          (vsync),
-        .next_vertical_o  (next_vertical),
-        .next_frame_o     (next_frame),
-        
-        // Debug signals
-        .debug_i (debug_i),
-        .debug_o (debug_o)
+        .rrggbb_o           (rrggbb),
+        .hsync_o            (hsync),
+        .vsync_o            (vsync),
+        .next_vertical_o    (next_vertical),
+        .next_frame_o       (next_frame)
     );
 
     logic [1:0] R;
@@ -93,15 +88,15 @@ module tt_um_tiny_shader_v2_mole99 (
     // Bottom row
     assign uio_out[4] = next_vertical; assign uio_oe[4] = 1'b1;
     assign uio_out[5] = next_frame; assign uio_oe[5] = 1'b1;
-    assign uio_out[6] = debug_o[0]; assign uio_oe[6] = 1'b0;
-    assign uio_out[7] = debug_o[1]; assign uio_oe[7] = 1'b0;
+    assign uio_out[6] = 1'b0; assign uio_oe[6] = 1'b0;
+    assign uio_out[7] = 1'b0; assign uio_oe[7] = 1'b0;
 
     // Input PMOD - mode
     
     assign mode = ui_in[0];
-    assign debug_i[0] = ui_in[1];
-    assign debug_i[1] = ui_in[2];
+    assign pause_execute = ui_in[1];
     /*
+    ui_in[2]
     ui_in[3]
     ui_in[4]
     ui_in[5]
