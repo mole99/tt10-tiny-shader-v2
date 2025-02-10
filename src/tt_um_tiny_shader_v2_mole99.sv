@@ -93,8 +93,8 @@ module tt_um_tiny_shader_v2_mole99 (
 
     // Input PMOD - mode
     
-    assign mode = ui_in[0];
-    assign pause_execute = ui_in[1];
+    assign mode = ui_in[0]; // TODO sync
+    assign pause_execute = ui_in[1]; // TODO sync
     /*
     ui_in[2]
     ui_in[3]
