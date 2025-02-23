@@ -46,8 +46,6 @@ module tt_um_tiny_shader_v2_mole99 (
         .spi_miso_o         (spi_miso),
         .spi_cs_i           (spi_cs),
         
-        // Mode signal
-        .mode_i             (mode),
         .pause_execute_i    (pause_execute),
 
         // SVGA signals
@@ -93,9 +91,9 @@ module tt_um_tiny_shader_v2_mole99 (
 
     // Input PMOD - mode
     
-    assign mode = ui_in[0]; // TODO sync
-    assign pause_execute = ui_in[1]; // TODO sync
+    assign pause_execute = ui_in[0]; // TODO sync
     /*
+    ui_in[1]
     ui_in[2]
     ui_in[3]
     ui_in[4]

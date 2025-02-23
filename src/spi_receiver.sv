@@ -16,18 +16,10 @@ module spi_receiver #(
     output logic spi_miso_o,
     input  logic spi_cs_i,
     
-    // Mode signal
-    // '0' = command mode
-    // '1' = data mode
-    input  logic       mode_i,
-    
     // Output memory
     output logic [7:0] memory_instr_o,  // current sprite data
     output logic       memory_shift_o,  // shift pulse
-    output logic       memory_load_o,   // shift new data into sprite
-    
-    // Output user register
-    output logic [REG_SIZE-1:0] user_o
+    output logic       memory_load_o    // shift new data into sprite
 );
     
     logic [REG_SIZE-1:0] user;
@@ -98,13 +90,8 @@ module spi_receiver #(
                 spi_cnt <= spi_cnt + 1;
                 
                 if (spi_cnt == 7) begin
-                    if (mode_i == 0) begin
-                        // Read the command
-                        user <= {spi_cmd[4:0], spi_mosi_sync};
-                    end else begin
-                        memory_shift_o <= 1'b1;
-                        memory_load_o  <= 1'b1;
-                    end
+                    memory_shift_o <= 1'b1;
+                    memory_load_o  <= 1'b1;
                 end
             end
             
@@ -116,7 +103,6 @@ module spi_receiver #(
     end
 
     // Assignments
-    assign user_o = user;
     assign memory_instr_o = spi_cmd;
 
 endmodule

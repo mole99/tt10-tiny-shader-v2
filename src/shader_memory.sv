@@ -32,9 +32,9 @@ module shader_memory #(
     generate
     
     genvar i, j;
-    for (i=0; i<NUM_INSTR; i++) begin : delays
-        for (j=0; j<8; j++) begin : bits
-            if (i < NUM_INSTR-1) begin
+    for (i=0; i<NUM_INSTR; i++) begin : gen_delays
+        for (j=0; j<8; j++) begin : gen_bits
+            if (i < NUM_INSTR-1) begin : gen_other
                 //memory[i] <= memory[i+1];
                 sky130_fd_sc_hd__dlygate4sd3_1 i_delay (
                     `ifdef USE_POWER_PINS
@@ -46,7 +46,7 @@ module shader_memory #(
                     .A   (memory[i+1][j]),
                     .X   (delay[i][j])
                 );
-            end else begin
+            end else begin : gen_last
                 sky130_fd_sc_hd__dlygate4sd3_1 i_delay (
                     `ifdef USE_POWER_PINS
                     .VPWR(1'b1),
@@ -93,7 +93,7 @@ module shader_memory #(
             `endif
         end else begin
             if (shift_i) begin
-                for (int i=0; i<NUM_INSTR; i++) begin
+                for (int n=0; n<NUM_INSTR; n++) begin
                     /*if (i < NUM_INSTR-1) begin
                         memory[i] <= memory[i+1];
                     end else begin
@@ -106,7 +106,7 @@ module shader_memory #(
                         end
                     end*/
                     
-                    memory[i] <= delay[i];
+                    memory[n] <= delay[n];
                 end
             end
         end

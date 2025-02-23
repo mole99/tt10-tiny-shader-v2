@@ -13,11 +13,6 @@ module tiny_shader_top (
     output logic spi_miso_o,
     input  logic spi_cs_i,
     
-    // Mode signal
-    // '0' = command mode
-    // '1' = data mode
-    input  logic mode_i,
-    
     // Pause shader execution
     // '0' = shader starts execution as normal
     // '1' = shader does not restart execution after
@@ -152,8 +147,6 @@ module tiny_shader_top (
     logic memory_shift;
     logic memory_load;
     
-    logic [5:0] user;
-    
     spi_receiver #(
         .REG_SIZE       (6),
         .REG_DEFAULT    (6'd42)
@@ -166,17 +159,11 @@ module tiny_shader_top (
         .spi_mosi_i     (spi_mosi_i),
         .spi_miso_o     (spi_miso_o),
         .spi_cs_i       (spi_cs_i),
-        
-        // Mode signal
-        .mode_i         (mode_i),
 
         // Output memory
         .memory_instr_o (memory_instr),
         .memory_shift_o (memory_shift),
-        .memory_load_o  (memory_load),
-        
-        // Output register
-        .user_o (user)
+        .memory_load_o  (memory_load)
     );
 
     // Graphics
@@ -232,8 +219,8 @@ module tiny_shader_top (
         .x_pos_i    (x_pos[5:0]),
         .y_pos_i    (y_pos[5:0]),
         
-        .time_i     (cur_time[8:3]),
-        .user_i     (user),
+        .time0_i     (cur_time[8:3]),
+        .time1_i     (cur_time[5:0]),
         
         .rgb_o      (rgb_o)
     );

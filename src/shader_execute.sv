@@ -12,8 +12,8 @@ module shader_execute (
     input  logic  [5:0]  x_pos_i,
     input  logic  [5:0]  y_pos_i,
     
-    input  logic [5:0] time_i,
-    input  logic [5:0] user_i,
+    input  logic [5:0] time0_i,
+    input  logic [5:0] time1_i,
     
     output logic [5:0]  rgb_o
 );
@@ -98,11 +98,11 @@ module shader_execute (
                         8'b00_0101_??: begin //  GETY
                             regs[arg0] <= y_pos_i;
                         end
-                        8'b00_0110_??: begin //  GETTIME
-                            regs[arg0] <= time_i;
+                        8'b00_0110_??: begin //  GETTIME0
+                            regs[arg0] <= time0_i;
                         end
-                        8'b00_0111_??: begin //  GETUSER
-                            regs[arg0] <= user_i;
+                        8'b00_0111_??: begin //  GETTIME1
+                            regs[arg0] <= time1_i;
                         end
 
                         8'b00_1000_??: begin //  IF ARG0 == REGS[0]
