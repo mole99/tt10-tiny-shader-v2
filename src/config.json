@@ -32,6 +32,7 @@
   "CLOCK_PORT": "clk",
   
   "USE_LIGHTER": true,
+  "SYNTH_STRATEGY": "AREA 0",
 
   "//": "Configuration docs: https://openlane.readthedocs.io/en/latest/reference/configuration.html",
 
