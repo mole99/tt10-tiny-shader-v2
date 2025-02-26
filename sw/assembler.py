@@ -12,8 +12,13 @@ instructions = {
     
     'GETX' : {'format': 'single_operand', 'opcode': '00_0100', 'short': 'RA <= X', 'description': 'Set the specified register to the x position of the current pixel.', 'category': 'Input'},
     'GETY' : {'format': 'single_operand', 'opcode': '00_0101', 'short': 'RA <= Y', 'description': 'Set the specified register to the y position of the current pixel.', 'category': 'Input'},
-    'GETTIME' : {'format': 'single_operand', 'opcode': '00_0110', 'short': 'RA <= TIME', 'description': 'Set the specified register to the current time value, increases with each frame.', 'category': 'Input'},
-    'GETUSER' : {'format': 'single_operand', 'opcode': '00_0111', 'short': 'RA <= USER', 'description': 'Set the specified register to the user value, can be set via the SPI interface.', 'category': 'Input'},
+    
+    # Old instructions
+    'GETTIME' : {'format': 'single_operand', 'opcode': '00_0110', 'short': 'RA <= TIME', 'description': 'Set the specified register to the current time value, increases with each frame.', 'category': 'Input', 'hidden': True},
+    'GETUSER' : {'format': 'single_operand', 'opcode': '00_0111', 'short': 'RA <= USER', 'description': 'Set the specified register to the user value, can be set via the SPI interface.', 'category': 'Input', 'hidden': True},
+    
+    'GETTIME0' : {'format': 'single_operand', 'opcode': '00_0110', 'short': 'RA <= TIME0', 'description': 'Set the specified register to the current time0 value, increments at 7.5Hz and counts down down again.', 'category': 'Input'},
+    'GETTIME1' : {'format': 'single_operand', 'opcode': '00_0111', 'short': 'RA <= TIME1', 'description': 'Set the specified register to the current time1 value, increments at 60Hz and counts down down again.', 'category': 'Input'},
     
     'IFEQ' : {'format': 'single_operand', 'opcode': '00_1000', 'short': 'TAKE <= RA == R0', 'description': 'Execute the next instruction if RA equals R0.', 'category': 'Branches'},
     'IFNE' : {'format': 'single_operand', 'opcode': '00_1001', 'short': 'TAKE <= RA != R0', 'description': 'Execute the next instruction if RA does not equal R0.', 'category': 'Branches'},
@@ -64,6 +69,9 @@ def summary():
     categories = {}
 
     for name, instruction in instructions.items():
+        if instruction.get('hidden', False):
+            continue
+    
         if not instruction['category'] in categories:
             categories[instruction['category']] = {}
         
@@ -144,7 +152,7 @@ def assemble(program, verbose=False):
 
     return assembled
 
-def simulate(program, x_pos=0, y_pos=0, time=0, user=0, verbose=False):
+def simulate(program, x_pos=0, y_pos=0, time0=0, time1=0, verbose=False):
     """Simulate the shader program"""
 
     register = [0, 0, 0, 0]
@@ -231,9 +239,13 @@ def simulate(program, x_pos=0, y_pos=0, time=0, user=0, verbose=False):
                 if token[0] == 'GETY':
                     register[op0] = y_pos & 0x3F
                 if token[0] == 'GETTIME':
-                    register[op0] = time & 0x3F
+                    register[op0] = time0 & 0x3F
                 if token[0] == 'GETUSER':
-                    register[op0] = user & 0x3F
+                    register[op0] = time1 & 0x3F
+                if token[0] == 'GETTIME0':
+                    register[op0] = time0 & 0x3F
+                if token[0] == 'GETTIME1':
+                    register[op0] = time1 & 0x3F
 
                 if token[0] == 'IFEQ':
                     skip = not (register[op0] == register[0])
@@ -326,7 +338,7 @@ def main():
             
             for y_pos in range(HEIGHT):
                 for x_pos in range(WIDTH):
-                    rgb = simulate(shader, x_pos, y_pos, time=time, user=42, verbose=args.verbose)
+                    rgb = simulate(shader, x_pos, y_pos, time0=time>>3, time1=time, verbose=args.verbose)
                     
                     if args.verbose:
                         #print(rgb)

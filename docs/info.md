@@ -11,11 +11,11 @@ You can also include images in this folder and reference them in the markdown. E
 
 Modern GPUs use fragment shaders to determine the final color for each pixel. Thousands of shading units run in parallel to speed up this process and ensure that a high FPS ratio can be achieved.
 
-Tiny Shader mimics such a shading unit and executes a shader with 10 instructions for each pixel. No framebuffer is used, the color values are generated on the fly. Tiny Shader also offers an SPI interface via which a new shader can be loaded. The final result can be viewed via the VGA output at 640x480 @ 60 Hz, although at an internal resolution of 64x48 pixel.
+Tiny Shader mimics such a shading unit and executes a shader with 16 instructions for each pixel. No framebuffer is used, the color values are generated on the fly. Tiny Shader also offers an SPI interface via which a new shader can be loaded. The final result can be viewed via the VGA output at 640x480 @ 60 Hz, although at an internal resolution of 80x60 pixel.
 
 ### Examples
 
-These images and many more can be generated with Tiny Shader. Note, that shaders can even be animated by acessing the user or time register.
+These images and many more can be generated with Tiny Shader. Note, that shaders can even be animated by acessing the time0 or time1 register.
 
 |||||
 |-|-|-|-|
@@ -60,8 +60,8 @@ The shader has four sources to get input from:
 
 - `X` - X position of the current pixel
 - `Y` - Y position of the current pixel
-- `TIME` - Increments at 7.5 Hz, before it overflow it counts down again.
-- `USER` - Register that can be set via the SPI interface.
+- `TIME0` - Increments at 7.5 Hz, before it overflow it counts down again.
+- `TIME1` - Increments at 60 Hz, before it overflow it counts down again.
 
 #### Output
 
@@ -89,8 +89,8 @@ The following instructions are supported by Tiny Shader. A program consists of 1
 |-----------|---------|-----------|
 |GETX RA|RA <= X|Set the specified register to the x position of the current pixel.|
 |GETY RA|RA <= Y|Set the specified register to the y position of the current pixel.|
-|GETTIME RA|RA <= TIME|Set the specified register to the current time value, increases with each frame.|
-|GETUSER RA|RA <= USER|Set the specified register to the user value, can be set via the SPI interface.|
+|GETTIME0 RA|RA <= TIME0|Set the specified register to the current time0 value, increments at 7.5Hz and counts down down again.|
+|GETTIME1 RA|RA <= TIME1|Set the specified register to the current time1 value, increments at 60Hz and counts down down again.|
 #### Branches
 |Instruction|Operation|Description|
 |-----------|---------|-----------|
@@ -136,13 +136,11 @@ The following instructions are supported by Tiny Shader. A program consists of 1
 
 ## How to test
 
-First set the clock to 2*25.175 MHz and reset the design. For a simple test, simply connect a Tiny VGA to the output Pmod. A shader is loaded by default and an image should be displayed via VGA.
+First set the clock to 50.25 MHz (2*25.175 MHz) and reset the design. For a simple test, simply connect a Tiny VGA to the output Pmod. A shader is loaded by default and an image should be displayed via VGA.
 
-For advanced features, connect an SPI controller to the bidir pmod. If ui[0], the mode signal, is set to 0, you can write to the user register via SPI. Note that only the last 6 bit are used.
-
-If the mode signal is 1, all bytes transmitted via SPI are shifted into the shader memory. This way you can load a new shader program. Have fun!
+For advanced features, connect an SPI controller to the bidir pmod. You can shift in new data into the shader memory one byte at a time. If you set `ui[0]` (`pause_execute`) to 1 the shader will stop execution and you can safely shift in new data. Set it back to 0 for the shader to resume operation. This way you can load a new shader program. Have fun!
 
 ## External hardware
 
 - [Tiny VGA](https://github.com/mole99/tiny-vga) or similar VGA Pmod
-- Optional: SPI controller to write the user register and new shaders
+- Optional: SPI controller to write new shaders
